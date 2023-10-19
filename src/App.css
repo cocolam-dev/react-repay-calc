@@ -1,0 +1,116 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.Forms {
+  display: flex;
+  justify-content: center;
+}
+
+.LoanDetailForm {
+  display: flex;
+  flex-direction: column;
+  /* max-width: 900px; */
+  align-items: center;
+  /* border: 1px solid #00c7a6; */
+  margin: 0.5rem;
+}
+
+.LoanDetailField,
+.RateChangeField {
+  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 0.5rem;
+}
+
+input,
+select {
+  margin: 0 10px;
+  width: 10rem;
+}
+
+table {
+  border: 2px solid #00c7a6;
+  font-size: 0.9rem;
+}
+
+th {
+  min-width: 6rem;
+  border-bottom: 1px solid #00c7a6;
+}
+
+td {
+  text-align: center;
+  border-bottom: 1px solid #d2fff8;
+  line-height: 1.5rem;
+}
+
+.StickyRow {
+  position: sticky;
+  top: 0;
+  background-color: #00c7a6;
+  color: #fff;
+}
+
+.AccRow {
+  font-weight: bold;
+}
+
+.RateRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+}
+
+.RateChangeInput {
+  width: 3rem;
+}
+
+/* .TableHeaders {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  font-weight: bold;
+}
+
+.TableHeader {
+  border: 1px solid #acacac;
+  padding: 1em;
+} */
+
+.btn {
+  width: 120px;
+  margin: 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.RateChangeBtn {
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+/* .RateChange {
+  cursor: pointer;
+} */
+
+@media (prefers-reduced-motion: no-preference) {
+}
