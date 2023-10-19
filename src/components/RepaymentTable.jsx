@@ -3,80 +3,95 @@ import { useGlobalContext } from "./GlobalContext";
 import { NumericFormat } from "react-number-format";
 
 const RepaymentTable = () => {
-  const { loanDetails, repayments, setRepayments } = useGlobalContext();
+  const {
+    loanDetails,
+    repayments,
+    setRepayments,
+    totalPrincipalRepaid,
+    setTotalPrincipalRepaid,
+    totalInterestPaid,
+    setTotalInterstPaid,
+  } = useGlobalContext();
 
-  // const [rate, setRate] = useState([repayments.InterestRate]);
-
-  let newRepayments = repayments;
-  let newRate;
   const handleChange = (e, id) => {
-    newRate = e.target.value;
-    console.log(e.target.value);
-    // setRate((rate[id].InterestRate = newRate));
-    newRepayments[id].InterestRate = newRate;
-    // console.log(newRepayments[id].InterestRate);
-    // for (let i = id; i < loanDetails.TermYear * 12; i++) {
-    //   newRepayments[i].InterestRate = newRate;
-    //   setRepayments(newRepayments);
-    // }
-  };
+    const newRate = e.target.value;
+    const newOpBal = repayments[id].OpBal;
+    const newRemainingNumOfMth = repayments[id].RemainingNumOfMth + 1;
+    let InterestPaid = 0;
+    let calcRepaymentAmt = 0;
+    let RepaymentAmt = 0;
+    let PrincipalRepaid = 0;
+    let ClBal = 0;
+    let AccPrincipalRepaid = parseFloat(0);
+    let AccInterestPaid = parseFloat(0);
+    const newRepayments = repayments.map((repayment) => {
+      if (repayment.id >= id) {
+        //calculate interest paid
+        InterestPaid = (
+          parseFloat(repayment.OpBal) *
+          (parseFloat(newRate) / 100 / 365.25) *
+          parseFloat(repayment.NumOfDays)
+        ).toFixed(2);
 
-  let InterestPaid = 0;
-  let calcRepaymentAmt;
-  let RepaymentAmt = 0;
-  const handleClick = (id) => {
-    for (let i = id; i < loanDetails.TermYear * 12; i++) {
-      newRepayments[i].InterestRate = parseFloat(newRate);
-      console.log(newRepayments[i]);
+        //calculate repayment amount
+        RepaymentAmt = (
+          parseFloat(repayment.RepaymentAmt) -
+          parseFloat(repayment.InterestPaid) +
+          parseFloat(InterestPaid)
+        ).toFixed(2);
 
-      //calculate interest paid
-      InterestPaid = (
-        newRepayments[i].OpBal *
-        (parseFloat(newRepayments[i].InterestRate) / 100 / 365.25) *
-        newRepayments[i].NumOfDays
-      ).toFixed(2);
+        //calculate principal repaid
+        PrincipalRepaid = (
+          parseFloat(RepaymentAmt) - parseFloat(InterestPaid)
+        ).toFixed(2);
 
-      newRepayments[i].InterestPaid = parseFloat(InterestPaid).toFixed(2);
+        // //calculate closing balance
+        ClBal = (repayment.OpBal - PrincipalRepaid).toFixed(2);
 
-      //calculate repayment amount
-      calcRepaymentAmt = (
-        (parseFloat(newRepayments[i].LoanAmount) *
-          (parseFloat(newRepayments[i].InterestRate) / 100 / 12)) /
-        (1 -
-          (1 + parseFloat(newRepayments[i].InterestRate) / 100 / 12) **
-            -(parseFloat(newRepayments[i].TermYear) * 12))
-      ).toFixed(2);
+        //calculate accumulated principal repaid
+        AccPrincipalRepaid = (
+          parseFloat(AccPrincipalRepaid) + parseFloat(PrincipalRepaid)
+        ).toFixed(2);
 
-      if (
-        parseFloat(newRepayments[i].OpBal) + parseFloat(InterestPaid) <
-        parseFloat(calcRepaymentAmt)
-      ) {
-        RepaymentAmt =
-          parseFloat(newRepayments[i].OpBal) + parseFloat(InterestPaid);
+        setTotalPrincipalRepaid(AccPrincipalRepaid);
+
+        //calculate accumulated interest paid
+        AccInterestPaid = (
+          parseFloat(AccInterestPaid) + parseFloat(InterestPaid)
+        ).toFixed(2);
+
+        return {
+          ...repayment,
+          InterestRate: newRate,
+          RepaymentAmt,
+          PrincipalRepaid,
+          InterestPaid,
+          ClBal,
+          AccPrincipalRepaid,
+          AccInterestPaid,
+        };
       } else {
-        RepaymentAmt = parseFloat(calcRepaymentAmt);
+        return repayment;
       }
-
-      newRepayments[i].RepaymentAmt = parseFloat(RepaymentAmt).toFixed(2);
-
-      setRepayments(newRepayments);
-
-      console.log(repayments[i]);
-    }
-    // setRepayments(newRepayments);
-    // console.log(newRepayments);
+    });
+    setRepayments(newRepayments);
   };
 
   return (
     <>
       <div>
+        <p>Once calculated, interest rate may be changed in the table below.</p>
+        <p>
+          New interest rate is applied to the month that has been changed, as
+          well as all following months
+        </p>
         <table>
           <tbody>
             <tr className="StickyRow">
-              <th>Remaining number of months</th>
+              <th className="HideInSmallWindow">Remaining number of months</th>
               <th>Year</th>
               <th>Month</th>
-              <th>Number of days</th>
+              <th className="HideInSmallWindow">Number of days</th>
               <th>Annual interest rate %</th>
               <th>Opening balance</th>
               <th>Repayment</th>
@@ -89,26 +104,21 @@ const RepaymentTable = () => {
             {repayments.map((repayment) => {
               return (
                 <tr key={repayment.id}>
-                  <td key="RemainingNumOfMth">{repayment.RemainingNumOfMth}</td>
+                  <td key="RemainingNumOfMth" className="HideInSmallWindow">
+                    {repayment.RemainingNumOfMth}
+                  </td>
                   <td key="Year">{repayment.Year}</td>
                   <td key="Month">{repayment.Month}</td>
-                  <td key="NumOfDays">{repayment.NumOfDays}</td>
-                  <td key="InterestRate" className="RateRow">
-                    {/* <input
+                  <td key="NumOfDays" className="HideInSmallWindow">
+                    {repayment.NumOfDays}
+                  </td>
+                  <td key="InterestRate">
+                    <input
                       className="RateChangeInput"
                       id="InterestRate"
-                      defaultValue={repayment.InterestRate}
+                      value={repayment.InterestRate}
                       onChange={(e) => handleChange(e, repayment.id)}
                     ></input>
-                    <button
-                      id="InterestRate"
-                      className="RateChangeBtn"
-                      title="Click to change rate starting from this month"
-                      onClick={() => handleClick(repayment.id)}
-                    >
-                      Apply
-                    </button> */}
-                    {repayment.InterestRate}
                   </td>
                   <td key="OpBal">
                     <NumericFormat
@@ -133,7 +143,7 @@ const RepaymentTable = () => {
                   </td>
                   <td key="InterestPaid">
                     <NumericFormat
-                      defaultValue={repayment.InterestPaid}
+                      value={repayment.InterestPaid}
                       displayType="text"
                       thousandSeparator=","
                     />

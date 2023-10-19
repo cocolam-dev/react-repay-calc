@@ -4,6 +4,20 @@
   text-align: center;
 }
 
+body {
+  margin: 0;
+  display: flex;
+  /* place-items: center; */
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0.3rem;
+  font-size: 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
 .Forms {
   display: flex;
   justify-content: center;
@@ -112,5 +126,17 @@ button:focus-visible {
   cursor: pointer;
 } */
 
-@media (prefers-reduced-motion: no-preference) {
+@media screen and (max-width: 900px) {
+  h1 {
+    text-align: left;
+  }
+  .Forms {
+    justify-content: left;
+  }
+  .HideInSmallWindow {
+    display: none;
+  }
+  :root {
+    font-size: 0.7rem;
+  }
 }

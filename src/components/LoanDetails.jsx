@@ -15,14 +15,14 @@ const LoanDetails = () => {
     setTotalInterstPaid,
   } = useGlobalContext();
 
-  //   const handleChange = (e) => {
-  //     let newLoanDetails = {
-  //       //   ...loanDetails,
-  //       [e.target.name]: e.target.value,
-  //     };
-  //     setLoanDetails(newLoanDetails);
-  //     console.log(newLoanDetails);
-  //   };
+  const handleChange = (e) => {
+    // let newLoanDetails = {
+    //   //   ...loanDetails,
+    //   [e.target.name]: e.target.value,
+    // };
+    // setLoanDetails(newLoanDetails);
+    // console.log(newLoanDetails);
+  };
 
   //https://www.youtube.com/watch?v=6VgozGK4qxQ&list=PLnHJACx3NwAep5koWkniVHw8PK7dWCO21&index=92
 
@@ -64,7 +64,7 @@ const LoanDetails = () => {
     let endDate;
     let NumOfDays = 0;
     let InterestRate = newLoanDetails.StartInterest;
-    let OpBal = parseFloat(newLoanDetails.LoanAmount);
+    let OpBal = parseFloat(newLoanDetails.LoanAmount).toFixed(2);
     let calcRepaymentAmt;
     let RepaymentAmt = 0;
     let InterestPaid = 0;
@@ -101,9 +101,11 @@ const LoanDetails = () => {
         parseFloat(OpBal) + parseFloat(InterestPaid) <
         parseFloat(calcRepaymentAmt)
       ) {
-        RepaymentAmt = parseFloat(OpBal) + parseFloat(InterestPaid);
+        RepaymentAmt = (parseFloat(OpBal) + parseFloat(InterestPaid)).toFixed(
+          2
+        );
       } else {
-        RepaymentAmt = parseFloat(calcRepaymentAmt);
+        RepaymentAmt = parseFloat(calcRepaymentAmt).toFixed(2);
       }
 
       //calculate principal repaid
@@ -133,6 +135,7 @@ const LoanDetails = () => {
         RemainingNumOfMth,
         Year,
         Month,
+        MonthNum,
         NumOfDays,
         InterestRate,
         OpBal,
@@ -158,13 +161,29 @@ const LoanDetails = () => {
     }
   };
 
-  const [rateChange, setRateChange] = useState();
   const handleRateChange = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const newRateChange = Object.fromEntries(formData);
-    setRateChange(newRateChange);
-    console.log(newRateChange);
+    console.log(e);
+    console.log(e.target.RateChangeFromRemainNumMth.value);
+    // console.log(e.target.RateChangeFromYear.value);
+    // console.log(e.target.RateChangeFromMonth.value);
+    console.log(e.target.RateChange.value);
+
+    let RateChangeFromRemainNumMth = e.target.RateChangeFromRemainNumMth.value;
+    // let RateChangeFromMonth = e.target.RateChangeFromYear.value;
+    let RateChange = e.target.RateChange.value;
+
+    setRepayments(
+      repayments.map((repayment) => {
+        if (repayment.RemainingNumOfMth <= RateChangeFromRemainNumMth) {
+          return { ...repayment, InterestRate: RateChange };
+        } else {
+          return repayment;
+        }
+      })
+    );
+
+    console.log(repayments);
   };
 
   return (
@@ -236,6 +255,17 @@ const LoanDetails = () => {
       </form>
       {/* <form className="LoanDetailForm" onSubmit={handleRateChange}>
         <li className="RateChangeField">
+          <label htmlFor="RateChangeFromRemainNumMth">
+            Rate Change From Year:{" "}
+          </label>
+          <input
+            id="RateChangeFromRemainNumMth"
+            name="RateChangeFromRemainNumMth"
+            type="number"
+            required
+          />
+        </li> */}
+      {/* <li className="RateChangeField">
           <label htmlFor="RateChangeFromYear">Rate Change From Year: </label>
           <input
             id="RateChangeFromYear"
@@ -246,14 +276,29 @@ const LoanDetails = () => {
         </li>
         <li className="RateChangeField">
           <label htmlFor="RateChangeFromMonth">Rate Change From Month: </label>
-          <input
+          <select
             id="RateChangeFromMonth"
             name="RateChangeFromMonth"
-            type="number"
+            type="string"
             required
-          />
-        </li>
-        <li className="RateChangeField">
+            //   onChange={handleChange}
+          >
+            <option value="">--- Please select ---</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </li> */}
+      {/* <li className="RateChangeField">
           <label htmlFor="RateChange">New annual interest rate %: </label>
           <input id="RateChange" name="RateChange" type="number" required />
         </li>
